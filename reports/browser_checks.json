@@ -1,0 +1,44 @@
+{
+  "photos": [
+    {
+      "file": "0_aparencia_saudavel_1.jpg",
+      "title": "5 folha(s) detectada(s)",
+      "result": "Folha de tomate — aparência saudável\nConfiança do modelo: 93.5%\nFolha de tomate — aparência saudável\nConfiança do modelo: 93.2%\nFolha de tomate — aparência saudável\nConfiança do modelo: 91.8%\nFolha de tomate — aparência saudável\nConfiança do modelo: 77.8%\nFolha de tomate — aparência saudável\nConfiança do modelo: 75.2%",
+      "time": "Servidor: 110.4 ms · ciclo completo: 176 ms"
+    },
+    {
+      "file": "0_aparencia_saudavel_2.jpg",
+      "title": "3 folha(s) detectada(s)",
+      "result": "Folha de tomate — aparência saudável\nConfiança do modelo: 91.2%\nFolha de tomate — aparência saudável\nConfiança do modelo: 90.6%\nFolha de tomate — aparência saudável\nConfiança do modelo: 82.5%",
+      "time": "Servidor: 30.3 ms · ciclo completo: 68 ms"
+    },
+    {
+      "file": "1_pinta_preta_1.jpg",
+      "title": "1 folha(s) detectada(s)",
+      "result": "Possível pinta-preta\nConfiança do modelo: 71.0%",
+      "time": "Servidor: 35.2 ms · ciclo completo: 70 ms"
+    },
+    {
+      "file": "1_pinta_preta_2.jpg",
+      "title": "3 folha(s) detectada(s)",
+      "result": "Possível pinta-preta\nConfiança do modelo: 57.0%\nPossível pinta-preta\nConfiança do modelo: 45.7%\nPossível requeima\nConfiança do modelo: 43.8%",
+      "time": "Servidor: 30.9 ms · ciclo completo: 65 ms"
+    },
+    {
+      "file": "2_requeima_1.jpg",
+      "title": "Resultado inconclusivo",
+      "result": "",
+      "time": "Servidor: 31.1 ms · ciclo completo: 56 ms"
+    },
+    {
+      "file": "2_requeima_2.jpg",
+      "title": "1 folha(s) detectada(s)",
+      "result": "Possível requeima\nConfiança do modelo: 93.3%",
+      "time": "Servidor: 22.9 ms · ciclo completo: 55 ms"
+    }
+  ],
+  "javascript_errors": [],
+  "mobile_horizontal_overflow": false,
+  "camera_test": "Chromium synthetic camera stream; not a physical camera or field validation",
+  "camera_stop_status": "Câmera encerrada."
+}

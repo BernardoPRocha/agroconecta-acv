@@ -1,0 +1,137 @@
+{
+  "version": "1.1",
+  "real_model_photos": [
+    {
+      "file": "0_aparencia_saudavel_1.jpg",
+      "rects": [
+        {
+          "x": 354.155595026643,
+          "y": 132.5023771790808,
+          "w": 69,
+          "h": 24
+        },
+        {
+          "x": 164.58969804618118,
+          "y": 0,
+          "w": 69,
+          "h": 24
+        },
+        {
+          "x": 0,
+          "y": 518.8586370839937,
+          "w": 69,
+          "h": 24
+        },
+        {
+          "x": 353.5801065719361,
+          "y": 511.3800316957211,
+          "w": 69,
+          "h": 24
+        },
+        {
+          "x": 1.6113676731793962,
+          "y": 256.30206022187,
+          "w": 69,
+          "h": 24
+        }
+      ],
+      "outside": false,
+      "overlap": false,
+      "result": "#1 — Folha de tomate — aparência saudável\nConfiança do modelo: 93.5%\n#2 — Folha de tomate — aparência saudável\nConfiança do modelo: 93.2%\n#3 — Folha de tomate — aparência saudável\nConfiança do modelo: 91.8%\n#4 — Folha de tomate — aparência saudável\nConfiança do modelo: 77.8%\n#5 — Folha de tomate — aparência saudável\nConfiança do modelo: 75.2%"
+    },
+    {
+      "file": "0_aparencia_saudavel_2.jpg",
+      "rects": [
+        {
+          "x": 234.01196013289035,
+          "y": 0,
+          "w": 69,
+          "h": 24
+        },
+        {
+          "x": 39.82724252491694,
+          "y": 101.19848484848484,
+          "w": 69,
+          "h": 24
+        },
+        {
+          "x": 424.6445182724252,
+          "y": 136.05303030303028,
+          "w": 69,
+          "h": 24
+        }
+      ],
+      "outside": false,
+      "overlap": false,
+      "result": "#1 — Folha de tomate — aparência saudável\nConfiança do modelo: 91.2%\n#2 — Folha de tomate — aparência saudável\nConfiança do modelo: 90.6%\n#3 — Folha de tomate — aparência saudável\nConfiança do modelo: 82.5%"
+    },
+    {
+      "file": "1_pinta_preta_1.jpg",
+      "rects": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 69,
+          "h": 24
+        }
+      ],
+      "outside": false,
+      "overlap": false,
+      "result": "#1 — Possível pinta-preta\nConfiança do modelo: 71.0%"
+    },
+    {
+      "file": "1_pinta_preta_2.jpg",
+      "rects": [
+        {
+          "x": 221.12684824902723,
+          "y": 0,
+          "w": 69,
+          "h": 24
+        },
+        {
+          "x": 337.36342412451364,
+          "y": 0,
+          "w": 69,
+          "h": 24
+        },
+        {
+          "x": 12.607003891050583,
+          "y": 454.5507936507937,
+          "w": 69,
+          "h": 24
+        }
+      ],
+      "outside": false,
+      "overlap": false,
+      "result": "#1 — Possível pinta-preta\nConfiança do modelo: 57.0%\n#2 — Possível pinta-preta\nConfiança do modelo: 45.7%\n#3 — Possível requeima\nConfiança do modelo: 43.8%"
+    },
+    {
+      "file": "2_requeima_1.jpg",
+      "rects": [],
+      "outside": false,
+      "overlap": false,
+      "result": ""
+    },
+    {
+      "file": "2_requeima_2.jpg",
+      "rects": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 69,
+          "h": 24
+        }
+      ],
+      "outside": false,
+      "overlap": false,
+      "result": "#1 — Possível requeima\nConfiança do modelo: 93.3%"
+    }
+  ],
+  "dense_layout_test": {
+    "count": 30,
+    "outside": false,
+    "overlap": false
+  },
+  "javascript_errors": [],
+  "mobile_overflow": false
+}

@@ -1,0 +1,90 @@
+{
+  "source": "https://raw.githubusercontent.com/pratikkayal/PlantDoc-Object-Detection-Dataset/4730a233a555b30ee98e0879c63ad25d82407455/",
+  "revision": "4730a233a555b30ee98e0879c63ad25d82407455",
+  "seed": 42,
+  "counts": {
+    "train": {
+      "images": 180,
+      "boxes": {
+        "tomate_saudavel": 298,
+        "pinta_preta": 151,
+        "requeima": 155
+      }
+    },
+    "val": {
+      "images": 45,
+      "boxes": {
+        "pinta_preta": 39,
+        "tomate_saudavel": 68,
+        "requeima": 37
+      }
+    },
+    "test": {
+      "images": 27,
+      "boxes": {
+        "pinta_preta": 19,
+        "requeima": 14,
+        "tomate_saudavel": 27
+      }
+    }
+  },
+  "errors": [
+    {
+      "source_split": "train",
+      "source_name": "IMG_1526.jpg",
+      "error": "image/annotation aspect ratio mismatch"
+    }
+  ],
+  "excluded_mixed": [
+    {
+      "name": "5775225744523264.jpeg.jpg",
+      "reason": "mixed labels outside scope"
+    },
+    {
+      "name": "Bacterial-leaf-spot-transplants1.jpg",
+      "reason": "mixed labels outside scope"
+    },
+    {
+      "name": "Early-blight.jpg",
+      "reason": "mixed labels outside scope"
+    },
+    {
+      "name": "Fig-2.jpg",
+      "reason": "mixed labels outside scope"
+    },
+    {
+      "name": "SpotSpeckBlightMite-1l4v879.jpg",
+      "reason": "mixed labels outside scope"
+    },
+    {
+      "name": "comparing-diseases-4-canker-tomato-1y51ejs.jpg",
+      "reason": "mixed labels outside scope"
+    }
+  ],
+  "duplicates_removed": [
+    {
+      "removed": "IMG_5360.jpg",
+      "kept": "20150619d.jpg"
+    },
+    {
+      "removed": "LateBlightLeaf.jpg",
+      "kept": "924977LateBlightLeaf.jpg"
+    },
+    {
+      "removed": "late_blight1.jpg",
+      "kept": "18c.jpg"
+    },
+    {
+      "removed": "symptoms_of_late_blight.jpg2__0.jpg",
+      "kept": "TomatoLateBlight-3-Underside-2ebj05b-300x225.jpg"
+    },
+    {
+      "removed": "tomato_late-blight_04_zoom.jpg",
+      "kept": "p1020084s.jpg"
+    },
+    {
+      "removed": "tomatoblight.jpg",
+      "kept": "EBTomato.jpg"
+    }
+  ]
+}

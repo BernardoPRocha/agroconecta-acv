@@ -1,0 +1,39 @@
+{
+  "split": "test",
+  "model_sha256": "59208d773ed4ccaf543d8edca5c0b9f8aa395bd33cee9a339979ef15e9fc02e2",
+  "metrics": {
+    "metrics/precision(B)": 0.6021741081500885,
+    "metrics/recall(B)": 0.6627904170543749,
+    "metrics/mAP50(B)": 0.6858009742358862,
+    "metrics/mAP50-95(B)": 0.4366935998734544,
+    "fitness": 0.4366935998734544
+  },
+  "per_class": {
+    "tomate_saudavel": {
+      "precision": 0.42628739641155466,
+      "recall": 0.5781566349562447,
+      "map50": 0.6104317419355618,
+      "map50_95": 0.28682202769146176
+    },
+    "pinta_preta": {
+      "precision": 0.9056270689095224,
+      "recall": 0.506261977897235,
+      "map50": 0.7233783738861363,
+      "map50_95": 0.4800664902456477
+    },
+    "requeima": {
+      "precision": 0.4746078591291887,
+      "recall": 0.9039526383096451,
+      "map50": 0.7235928068859601,
+      "map50_95": 0.5431922816832538
+    }
+  },
+  "speed_ms_per_image": {
+    "preprocess": 0.19334333333315754,
+    "inference": 17.568713259259365,
+    "loss": 0.00033048148237766226,
+    "postprocess": 0.9817208518509485
+  },
+  "output_directory": "/workspace/scratch/5c0b4f82e4eb/agroconecta-acv/runs/test",
+  "note": "Offline dataset evaluation; not proof of field reliability or browser FPS."
+}
