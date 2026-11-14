@@ -1,0 +1,97 @@
+"""Generate the technical PDF from real evaluation artifacts. Requires reportlab."""
+import json,csv
+from pathlib import Path
+from xml.sax.saxutils import escape
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet,ParagraphStyle
+from reportlab.lib.enums import TA_LEFT
+from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,Table,TableStyle,PageBreak,Image,KeepTogether
+from reportlab.lib.utils import ImageReader
+ROOT=Path(__file__).resolve().parents[1]
+OUT=ROOT/'reports/Relatorio_Tecnico_ACV_AgroConecta.pdf'
+M=json.loads((ROOT/'reports/test_metrics.json').read_text());A=json.loads((ROOT/'reports/dataset_audit.json').read_text())
+GREEN=colors.HexColor('#166047');INK=colors.HexColor('#19372e');LIGHT=colors.HexColor('#edf4ef')
+styles=getSampleStyleSheet()
+styles.add(ParagraphStyle(name='TitleA',fontName='Helvetica-Bold',fontSize=30,leading=34,textColor=INK,spaceAfter=18))
+styles.add(ParagraphStyle(name='SectionA',fontName='Helvetica-Bold',fontSize=17,leading=21,textColor=GREEN,spaceAfter=13))
+styles.add(ParagraphStyle(name='BodyA',fontName='Helvetica',fontSize=10,leading=15,textColor=INK,spaceAfter=10))
+styles.add(ParagraphStyle(name='SmallA',fontName='Helvetica',fontSize=8,leading=11,textColor=INK,spaceAfter=7))
+styles.add(ParagraphStyle(name='CodeA',fontName='Courier',fontSize=8,leading=12,textColor=INK,spaceAfter=10))
+story=[]
+def p(s,style='BodyA'):return Paragraph(s,styles[style])
+def add(s,style='BodyA'):story.append(p(s,style))
+def heading(s):add(s,'SectionA')
+def table(rows,widths):
+ t=Table([[p(str(c),'SmallA') for c in row] for row in rows],colWidths=widths,hAlign='LEFT')
+ t.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),LIGHT),('VALIGN',(0,0),(-1,-1),'TOP'),('LEFTPADDING',(0,0),(-1,-1),9),('RIGHTPADDING',(0,0),(-1,-1),9),('TOPPADDING',(0,0),(-1,-1),8),('BOTTOMPADDING',(0,0),(-1,-1),7),('LINEBELOW',(0,0),(-1,-1),.4,colors.HexColor('#dce6dd'))]));story.extend([t,Spacer(1,14)])
+def pic(path,w,h):
+ iw,ih=ImageReader(str(path)).getSize();scale=min(w/iw,h/ih);return Image(str(path),iw*scale,ih*scale)
+def new():story.append(PageBreak())
+def footer(c,doc):
+ c.setStrokeColor(GREEN);c.line(45,43,550,43);c.setFont('Helvetica',8);c.setFillColor(INK)
+ c.drawString(45,29,'AgroConecta | Applied Computer Vision | 10/11/2026');c.drawRightString(550,29,str(doc.page))
+add('GLOBAL SOLUTION 2026.2 · FIAP','SmallA')
+add('AgroConecta<br/>Análise de folhas','TitleA')
+add('Relatório técnico de Applied Computer Vision','SectionA')
+add('Protótipo de triagem visual para pequenos produtores rurais. Detector customizado de folhas de tomate com aparência saudável, sinais de pinta-preta ou sinais de requeima, integrado a uma aplicação web local.')
+table([['Integrante','RM','Responsabilidade'],['Bernardo Rocha','99209','ACV e Secure DevOps'],['Eric Rodrigues','550249','RPA e Big Data'],['Renato Izumi','99242','Startup e IA generativa']],[180,70,255])
+heading('Resultado desta versão')
+add('<b>Modelo treinado e aplicação executável.</b> O YOLOv8n foi ajustado por 30 épocas e avaliado em 27 imagens de teste separadas. O pacote inclui pesos, dados preparados, scripts, métricas reais, API, interface e roteiro de apresentação.')
+add('<b>mAP@50: 68,6% | mAP@50:95: 43,7%.</b> Esses valores medem detecção de objetos; não equivalem a uma porcentagem de diagnósticos corretos.')
+add('O projeto se relaciona aos ODS 2 e 13 pela proposta de apoiar o acompanhamento do cultivo. Redução de perdas, economia de recursos e melhoria de renda são benefícios esperados, ainda não medidos em campo.')
+heading('Escopo e limites')
+add('As caixas marcam folhas inteiras segundo as anotações da base. A saída é uma hipótese visual. Ausência de detecção é inconclusiva e não confirma saúde. Não há recomendação de defensivos nem validação agronômica.')
+new();heading('01 / Dados e preparação')
+add('Foi utilizado o PlantDoc Object Detection Dataset, com a versão fixada no commit abaixo. A fonte é real e pública. Foram selecionados os rótulos Tomato leaf, Tomato Early blight leaf e Tomato leaf late blight.')
+add('4730a233a555b30ee98e0879c63ad25d82407455','CodeA')
+table([['Conjunto','Imagens','Saudável*','Pinta-preta','Requeima'],['Treino',180,298,151,155],['Validação',45,68,39,37],['Teste',27,27,19,14]],[125,70,100,100,110])
+add('* As três últimas colunas contam caixas, não imagens. Saudável corresponde ao rótulo Tomato leaf da base. Uma mesma imagem pode conter várias folhas.','SmallA')
+add('<b>Qualidade:</b> seis imagens duplicadas ou aproximadamente duplicadas removidas, seis com categorias adicionais fora do escopo excluídas e uma com proporção incompatível entre imagem e anotação rejeitada. A relação exata está em dataset_audit.json.')
+add('<b>Conversão:</b> caixas CSV em pixels foram normalizadas para o formato YOLO: classe, centro X, centro Y, largura, altura. Foram verificadas caixas positivas, limites da imagem e proporção dimensional.')
+add('<b>Separação:</b> preservou-se o teste original, com prioridade sobre duplicatas. O restante foi separado em treino e validação com semente 42, aproximadamente 80/20, por combinação de classes.')
+add('<b>Duplicatas:</b> comparação por hash dos pixels e hash médio de 256 bits, com distância até quatro. A regra é heurística; não demonstra ausência de todas as imagens derivadas ou semelhantes. O teste automatizado confirmou a ausência dos casos detectáveis por essa regra entre os conjuntos.')
+heading('Treinamento reproduzível')
+table([['Parâmetro','Valor desta execução'],['Modelo inicial','YOLOv8n pré-treinado; ajuste das três classes'],['Épocas / resolução / lote','30 / 320 pixels / 8 imagens'],['Dispositivo / semente','CPU / 42'],['Otimização','optimizer=auto; aumento de dados padrão; close_mosaic=5'],['Seleção do peso','Melhor checkpoint pela validação; teste não usado para seleção']],[185,320])
+add('Scripts e manifestos preservam procedência e divisão. O notebook Colab permite repetir o experimento com GPU. Uma configuração de 60 épocas e 640 px foi deixada como opção para nova experiência; não foi executada nesta versão.','SmallA')
+new();heading('02 / Avaliação independente')
+vals=M['metrics'];table([['Métrica','Teste'],['Precisão',f"{vals['metrics/precision(B)']:.4f}"],['Recall',f"{vals['metrics/recall(B)']:.4f}"],['mAP@50',f"{vals['metrics/mAP50(B)']:.4f}"],['mAP@50:95',f"{vals['metrics/mAP50-95(B)']:.4f}"]],[280,225])
+rows=[['Classe','Precisão','Recall','mAP@50','mAP@50:95']]
+for name,r in M['per_class'].items():rows.append([{'tomate_saudavel':'Aparência saudável','pinta_preta':'Pinta-preta','requeima':'Requeima'}[name]]+[f'{r[k]:.3f}' for k in ['precision','recall','map50','map50_95']])
+table(rows,[145,90,90,90,90])
+add('As métricas acima são calculadas pelo Ultralytics sobre suas curvas de avaliação. A precisão e o recall resumidos usam o ponto escolhido pela rotina, não necessariamente a confiança 0,4 da interface.')
+add('<b>Ponto operacional da auditoria:</b> com confiança 0,4 e IoU 0,5, houve 35 correspondências corretas (TP), 29 previsões sem correspondência de mesma classe (FP) e 25 caixas de referência não correspondidas (FN). O pareamento foi guloso e por classe; não é o cálculo de mAP.')
+add(f"<b>Tempo offline:</b> {M['speed_ms_per_image']['inference']:.1f} ms de inferência por imagem nesta execução em CPU. Esse número não inclui toda a captura, comunicação e renderização no navegador, portanto não deve ser convertido diretamente em FPS do produto.")
+story.append(pic(ROOT/'runs/test/confusion_matrix_normalized.png',430,230))
+add('Matriz de confusão normalizada produzida pela avaliação. O conjunto é pequeno; medidas e erros devem ser interpretados junto das previsões e das anotações.','SmallA')
+new();heading('03 / Erros reais e interpretação')
+rows=[['Imagem','TP / FP / FN','Observação visual'],['bugs-and-blight-061.jpg','1 / 13 / 3','Muitas previsões de saudável em cena anotada com pinta-preta. Há folhas visíveis sem caixas de referência.'],['Tomato59.JPG.jpg','3 / 0 / 7','Diversas folhas pequenas e sobrepostas foram omitidas.'],['dscn3175.jpg','1 / 0 / 5','Somente uma das seis caixas de pinta-preta foi correspondida.'],['Shoemaker_7068.JPG.jpg','0 / 2 / 1','Referência de pinta-preta foi confundida com requeima.'],['tomato_early-blight_01_zoom.jpg','1 / 1 / 2','Divergência na localização e contagem, apesar de previsões da classe correta.']]
+table(rows,[165,80,260])
+add('FP/FN são relativos às anotações do dataset. Anotações incompletas podem penalizar detecções plausíveis. Escala, sobreposição e confusão visual são hipóteses explicativas; não houve experimento causal para confirmá-las.')
+add('<b>Exemplo de confusão entre classes:</b> referência à esquerda; previsão à direita. Imagem de teste Shoemaker_7068.JPG.jpg, origem PlantDoc.','SmallA')
+key='c85286e8013a50d23839'
+t=Table([[pic(ROOT/f'reports/predictions/{key}_ground_truth.jpg',245,180),pic(ROOT/f'reports/predictions/{key}_prediction.jpg',245,180)]],colWidths=[252,253]);story.append(t);story.append(Spacer(1,15))
+add('<b>Próximas melhorias:</b> revisar rótulos e completude das caixas, coletar mais exemplos contrastantes, comparar maior resolução na validação e reservar imagens externas de campo. Se os casos de teste forem usados para ajustar o sistema, será necessário outro teste independente.')
+add('A revisão de cinco casos e todas as previsões reais estão em reports/REVISAO_ERROS.md e reports/predictions. Nenhuma métrica foi preenchida por estimativa.','SmallA')
+new();heading('04 / Aplicação e integração')
+add('A interface HTML/CSS/JavaScript captura uma foto ou um quadro da câmera. O FastAPI valida o arquivo, corrige a orientação EXIF, executa o detector e retorna JSON. O navegador transforma as coordenadas para a resolução de exibição. Na versão 1.1, etiquetas curtas mostram identificador e confiança; as descrições completas aparecem na lista numerada, evitando textos grandes em imagens pequenas.')
+table([['Componente','Comportamento implementado'],['Entrada','JPEG, PNG ou WEBP; até 8 MB; limite de 16 milhões de pixels'],['Inferência','CPU; uma chamada por vez; três classes verificadas ao carregar'],['Resposta','Caixas em pixels, categoria, pontuação, latência e estado inconclusivo'],['Câmera','Um quadro por vez; início/parada e tratamento de falha; localhost ou HTTPS'],['Persistência','Fotos não são armazenadas; processamento em memória'],['Ausência do modelo','HTTP 503; não há previsão simulada no produto']],[140,365])
+heading('Contrato para o restante do grupo')
+add('GET /health: processo e disponibilidade do modelo.<br/>GET /ready: 200 se pronto, 503 caso contrário.<br/>POST /api/predict?confidence=0.4: multipart, campo file.<br/>GET /docs: documentação interativa.','CodeA')
+add('Renato poderá consumir as categorias para explicar hipóteses com fontes. Eric poderá integrar o histórico ao backend central. O módulo de visão funciona sem depender de RPA, Big Data ou LLM. O contrato completo está em docs/API.md.')
+heading('Verificação executada')
+add('Sete testes automatizados passaram. Foram testadas seis fotos reais pelo navegador e pelo modelo, sem erros JavaScript. O layout foi inspecionado em larguras de 1365 e 390 pixels. A câmera foi exercitada com um dispositivo simulado do Chromium, incluindo envio, resposta e parada.')
+add('<b>Limite da verificação:</b> a simulação inicial validou o fluxo de software. Posteriormente, Bernardo confirmou o funcionamento da câmera física e enviou uma captura apontando para uma fotografia em outra tela. Essa evidência não comprova desempenho com plantas reais em campo. A inspeção do navegador e os tempos por foto estão registrados em browser_checks.json.')
+add('O Dockerfile usa usuário não-root e o Compose limita a porta a localhost. Foram preparados, mas não executados porque Docker não estava disponível. Infraestrutura pública e monitoramento completo pertencem à etapa de Secure.')
+new();heading('05 / Execução e fechamento da entrega')
+add('<b>Para usar o modelo incluído, não é necessário treinar novamente.</b> Extraia o ZIP, instale Python 3.12 e siga o README na pasta agroconecta-acv.')
+add('py -3.12 -m venv .venv<br/>.venv\\Scripts\\python -m pip install -r requirements.txt<br/>.venv\\Scripts\\python -m uvicorn app.main:app<br/>Abra http://localhost:8000','CodeA')
+add('O README detalha a instalação de PyTorch em CPU antes das demais dependências, evitando baixar componentes CUDA desnecessários. O arquivo INICIAR_WINDOWS.bat facilita as próximas execuções.')
+table([['Item','Situação'],['Código, pesos, dados e instruções','Incluídos no pacote'],['Métricas e exemplos de erro','Executados com dados reais e documentados'],['PDF técnico','Incluído; revisar com o grupo antes da submissão'],['Vídeo demonstrativo','Demo com fotos sem áudio incluída; narração, câmera e link pendentes'],['Câmera física','Confirmada pelo usuário com fotografia em tela; campo não validado'],['Repositório público','Publicação e link pendentes'],['Integração e URL pública do MVP','Pendentes na etapa de Secure']],[260,245])
+heading('Referências e rastreabilidade')
+add('Singh et al. (2020). PlantDoc: A Dataset for Visual Plant Disease Detection. DOI: 10.1145/3371158.3371196.','SmallA')
+add('Dataset: github.com/pratikkayal/PlantDoc-Object-Detection-Dataset. Licença declarada: CC BY 4.0. Cópia em docs/PLANTDOC_LICENSE.txt. Preservar os créditos e observar direitos de terceiros sobre imagens originalmente coletadas da internet.','SmallA')
+add('Ultralytics YOLOv8: docs.ultralytics.com/models/yolov8/<br/>Treino: docs.ultralytics.com/modes/train/<br/>Avaliação: docs.ultralytics.com/modes/val/<br/>Versão executada: Ultralytics 8.3.200; PyTorch 2.7.1+cpu. Ultralytics usa AGPL-3.0 ou licença comercial conforme seus termos.','SmallA')
+add('SHA-256 do modelo incluído:<br/>'+M['model_sha256'][:32]+'<br/>'+M['model_sha256'][32:],'CodeA')
+add('A aderência foi planejada com base no resumo de requisitos fornecido. Antes da entrega, conferir o enunciado original completo, os critérios de avaliação e os links exigidos.','SmallA')
+SimpleDocTemplate(str(OUT),pagesize=(595.28,841.89),rightMargin=45,leftMargin=45,topMargin=42,bottomMargin=58,title='AgroConecta - Relatório técnico ACV',author='Grupo AgroConecta').build(story,onFirstPage=footer,onLaterPages=footer)
+print(OUT)
