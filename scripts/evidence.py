@@ -1,57 +1,170 @@
-"""Save genuine test predictions and an automatic FP/FN audit at conf=.4, IoU=.5."""
-import json,time
-from pathlib import Path
-from PIL import Image,ImageDraw
-from prepare_data import ROOT,NAMES
+"""Registra previsões e audita correspondências no conjunto de teste PlantDoc.
 
-def iou(a,b):
-    x1,y1=max(a[0],b[0]),max(a[1],b[1]);x2,y2=min(a[2],b[2]),min(a[3],b[3])
-    intersection=max(0,x2-x1)*max(0,y2-y1)
-    return intersection/max(1e-9,(a[2]-a[0])*(a[3]-a[1])+(b[2]-b[0])*(b[3]-b[1])-intersection)
+A auditoria usa confiança 0,4, IoU 0,5 e pareamento guloso por classe.
+Essas contagens não substituem as métricas mAP calculadas na avaliação.
+"""
+
+import json
+import time
+from pathlib import Path
+
+from PIL import Image, ImageDraw
+
+from prepare_data import NAMES, ROOT
+
+
+def iou(a, b):
+    x1 = max(a[0], b[0])
+    y1 = max(a[1], b[1])
+    x2 = min(a[2], b[2])
+    y2 = min(a[3], b[3])
+    intersection = max(0, x2 - x1) * max(0, y2 - y1)
+    area_a = (a[2] - a[0]) * (a[3] - a[1])
+    area_b = (b[2] - b[0]) * (b[3] - b[1])
+    union = max(1e-9, area_a + area_b - intersection)
+    return intersection / union
+
 
 def main():
     import torch
     from ultralytics import YOLO
-    torch.set_num_threads(4)
-    model=YOLO(str(ROOT/'models/best.pt'))
-    meta=json.loads((ROOT/'models/metadata.json').read_text())
-    rows=[r for r in json.loads((ROOT/'data/tomato/manifest.json').read_text())['items'] if r['split']=='test']
-    output=ROOT/'reports/predictions';output.mkdir(exist_ok=True)
-    audit=[]
-    for row in rows:
-        path=ROOT/'data/tomato/images/test'/(row['key']+'.jpg')
-        with Image.open(path) as im: w,h=im.size
-        start=time.perf_counter()
-        pred=model.predict(str(path),imgsz=meta['imgsz'],conf=.4,device='cpu',verbose=False)[0]
-        elapsed=1000*(time.perf_counter()-start)
-        predicted=[{'class_id':int(b.cls.item()),'confidence':float(b.conf.item()),'bbox':b.xyxy[0].tolist()} for b in pred.boxes]
-        ground=[{'class_id':b[0],'bbox':[(b[1]-b[3]/2)*w,(b[2]-b[4]/2)*h,(b[1]+b[3]/2)*w,(b[2]+b[4]/2)*h]} for b in row['boxes']]
-        matches=set();tp=0
-        for p in sorted(predicted,key=lambda d:-d['confidence']):
-            candidates=[(iou(p['bbox'],g['bbox']),i) for i,g in enumerate(ground) if i not in matches and p['class_id']==g['class_id']]
-            overlap,i=max(candidates,default=(0,-1))
-            if overlap>=.5:matches.add(i);tp+=1
-        fp=len(predicted)-tp;fn=len(ground)-tp
-        # Predicted image only. Ground truth stored separately to distinguish it clearly.
-        pred.save(filename=str(output/(row['key']+'_prediction.jpg')))
-        with Image.open(path) as im:
-            im=im.convert('RGB');draw=ImageDraw.Draw(im)
-            for g in ground:
-                draw.rectangle(g['bbox'],outline='blue',width=3)
-                draw.text((g['bbox'][0],g['bbox'][1]),NAMES[g['class_id']],fill='blue')
-            im.save(output/(row['key']+'_ground_truth.jpg'))
-        audit.append({'image':row['key']+'.jpg','original_filename':row['source_name'],'tp':tp,'fp':fp,'fn':fn,
-                      'latency_ms':elapsed,'ground_truth':ground,'predictions':predicted})
-    summary={'confidence':.4,'iou':.5,'note':'Class-aware greedy matching; not the mAP calculation.',
-             'model_sha256':meta['sha256'],'tp':sum(r['tp'] for r in audit),'fp':sum(r['fp'] for r in audit),
-             'fn':sum(r['fn'] for r in audit),'images':audit}
-    (ROOT/'reports/prediction_audit.json').write_text(json.dumps(summary,indent=2))
-    errors=sorted([r for r in audit if r['fp']+r['fn']>0],key=lambda r:-(r['fp']+r['fn']))[:5]
-    text='# Análise automática de até cinco erros reais\n\nConfiança 0,4 e IoU 0,5; pareamento por classe. Falsos positivos/negativos são relativos às anotações da base, que também podem conter erros. Revisão humana ainda necessária.\n\n'
-    for i,r in enumerate(errors,1):
-        text+=f"## Caso {i}: {r['original_filename']}\n\nArquivo: `{r['image']}`. TP={r['tp']}; FP={r['fp']}; FN={r['fn']}.\n\n"
-        text+='Observação: o modelo não reproduziu integralmente as caixas e classes anotadas. As imagens de referência e previsão estão em `reports/predictions`. Iluminação, escala, confusão entre classes e anotações inconsistentes são hipóteses a verificar, não causas comprovadas.\n\n'
-    (ROOT/'reports/ERROS_REAIS.md').write_text(text)
-    print({k:summary[k] for k in ['tp','fp','fn']})
 
-if __name__=='__main__':main()
+    torch.set_num_threads(4)
+    model = YOLO(str(ROOT / "models/best.pt"))
+    metadata = json.loads((ROOT / "models/metadata.json").read_text())
+    manifest = json.loads((ROOT / "data/tomato/manifest.json").read_text())
+    test_items = [item for item in manifest["items"] if item["split"] == "test"]
+
+    output_dir = ROOT / "reports/predictions"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    audit = []
+
+    for item in test_items:
+        image_path = ROOT / "data/tomato/images/test" / (item["key"] + ".jpg")
+        with Image.open(image_path) as image:
+            width, height = image.size
+
+        started = time.perf_counter()
+        result = model.predict(
+            str(image_path),
+            imgsz=metadata["imgsz"],
+            conf=0.4,
+            device="cpu",
+            verbose=False,
+        )[0]
+        elapsed_ms = (time.perf_counter() - started) * 1000
+
+        predictions = [
+            {
+                "class_id": int(box.cls.item()),
+                "confidence": float(box.conf.item()),
+                "bbox": box.xyxy[0].tolist(),
+            }
+            for box in result.boxes
+        ]
+        reference = [
+            {
+                "class_id": box[0],
+                "bbox": [
+                    (box[1] - box[3] / 2) * width,
+                    (box[2] - box[4] / 2) * height,
+                    (box[1] + box[3] / 2) * width,
+                    (box[2] + box[4] / 2) * height,
+                ],
+            }
+            for box in item["boxes"]
+        ]
+
+        matched = set()
+        true_positives = 0
+        for predicted in sorted(predictions, key=lambda row: -row["confidence"]):
+            candidates = [
+                (iou(predicted["bbox"], truth["bbox"]), index)
+                for index, truth in enumerate(reference)
+                if index not in matched and predicted["class_id"] == truth["class_id"]
+            ]
+            overlap, index = max(candidates, default=(0, -1))
+            if overlap >= 0.5:
+                matched.add(index)
+                true_positives += 1
+
+        false_positives = len(predictions) - true_positives
+        false_negatives = len(reference) - true_positives
+
+        result.save(filename=str(output_dir / f"{item['key']}_prediction.jpg"))
+        with Image.open(image_path) as image:
+            image = image.convert("RGB")
+            drawing = ImageDraw.Draw(image)
+            for truth in reference:
+                drawing.rectangle(truth["bbox"], outline="blue", width=3)
+                drawing.text(
+                    (truth["bbox"][0], truth["bbox"][1]),
+                    NAMES[truth["class_id"]],
+                    fill="blue",
+                )
+            image.save(output_dir / f"{item['key']}_ground_truth.jpg")
+
+        audit.append(
+            {
+                "image": f"{item['key']}.jpg",
+                "original_filename": item["source_name"],
+                "tp": true_positives,
+                "fp": false_positives,
+                "fn": false_negatives,
+                "latency_ms": elapsed_ms,
+                "ground_truth": reference,
+                "predictions": predictions,
+            }
+        )
+
+    summary = {
+        "confidence": 0.4,
+        "iou": 0.5,
+        "note": "Class-aware greedy matching; not the mAP calculation.",
+        "model_sha256": metadata["sha256"],
+        "tp": sum(row["tp"] for row in audit),
+        "fp": sum(row["fp"] for row in audit),
+        "fn": sum(row["fn"] for row in audit),
+        "images": audit,
+    }
+    (ROOT / "reports/prediction_audit.json").write_text(
+        json.dumps(summary, indent=2), encoding="utf-8"
+    )
+
+    worst_cases = sorted(
+        (row for row in audit if row["fp"] + row["fn"] > 0),
+        key=lambda row: -(row["fp"] + row["fn"]),
+    )[:5]
+
+    sections = [
+        "# Auditoria automática de erros no teste",
+        "",
+        "Critérios: confiança 0,4 e IoU 0,5, com pareamento por classe. "
+        "TP, FP e FN são relativos às anotações, que podem conter omissões. "
+        "A análise visual dos casos documentados está em `reports/REVISAO_ERROS.md`.",
+        "",
+    ]
+    for number, case in enumerate(worst_cases, 1):
+        sections.extend(
+            [
+                f"## Caso {number}: {case['original_filename']}",
+                "",
+                f"Arquivo: `{case['image']}`. "
+                f"TP={case['tp']}; FP={case['fp']}; FN={case['fn']}.",
+                "",
+                "As caixas e classes previstas não correspondem integralmente às anotações. "
+                "Referência e predição em `reports/predictions/`. "
+                "Escala, iluminação e anotações incompletas são hipóteses, "
+                "não causas comprovadas.",
+                "",
+            ]
+        )
+
+    (ROOT / "reports/ERROS_REAIS.md").write_text(
+        "\n".join(sections), encoding="utf-8"
+    )
+    print({name: summary[name] for name in ("tp", "fp", "fn")})
+
+
+if __name__ == "__main__":
+    main()

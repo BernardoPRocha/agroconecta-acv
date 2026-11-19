@@ -1,48 +1,22 @@
-# Publicar o ACV no GitHub
+# Publicação do AgroConecta ACV
 
-Nome sugerido: `agroconecta-acv`. Visibilidade exigida pelo resumo do enunciado: pública.
+## Repositório público
 
-Nenhum repositório foi publicado nesta atualização. A conexão disponível não retornou repositórios acessíveis. Não foram inventados links de GitHub ou de vídeo.
+**URL:** https://github.com/BernardoPRocha/agroconecta-acv  
+**Branch principal:** `main`  
+**Disciplina:** Applied Computer Vision — Global Solution 2026.2, FIAP
 
-## Criar e enviar
+## Materiais publicados
 
-1. Entre no GitHub e crie um repositório público vazio chamado agroconecta-acv. Não adicione README, licença nem .gitignore pelo site: esses arquivos já pertencem ao projeto.
-2. Copie a URL HTTPS real do novo repositório.
-3. Abra o terminal dentro da pasta agroconecta-acv e execute:
+- Código da aplicação em `app/`.
+- Scripts de preparação, treinamento e avaliação em `scripts/`.
+- Pesos do detector em `models/best.pt` e configuração em `models/metadata.json`.
+- Evidências de treinamento e testes em `reports/`.
+- PDF final em `reports/Relatorio_Tecnico_ACV_AgroConecta.pdf`.
+- [Vídeo final de demonstração](https://www.youtube.com/watch?v=KIRmYhAmrdI).
 
-```bat
-git init
-git add .
-git status
-```
+O repositório contém a implementação do módulo ACV. A publicação do código no GitHub não equivale à hospedagem pública do aplicativo. A documentação da infraestrutura do MVP está no repositório separado [agroconecta-secure](https://github.com/BernardoPRocha/agroconecta-secure).
 
-Confira os arquivos que serão incluídos. A pasta .venv, dados completos e runs devem ficar excluídos pelo .gitignore. O modelo models/best.pt está incluído explicitamente.
+## Rastreabilidade
 
-```bat
-git commit -m "Entrega inicial do modulo ACV AgroConecta"
-git branch -M main
-```
-
-Se o Git solicitar identidade, configure seu nome e seu e-mail do GitHub localmente nesse repositório e repita o commit:
-
-```bat
-git config user.name "Bernardo Rocha"
-git config user.email "SEU_EMAIL_DO_GITHUB"
-```
-
-Adicione a URL real (substitua o texto entre aspas, sem usar literalmente o exemplo):
-
-```bat
-git remote add origin "URL_HTTPS_REAL_DO_REPOSITORIO"
-git push -u origin main
-```
-
-Se o repositório já tiver histórico ou o remoto origin já existir, não use force e não apague o histórico. Confira `git remote -v` e adapte o envio ao repositório existente.
-
-## Conferir antes de entregar
-
-- Abra o repositório em janela anônima para conferir que está público.
-- Verifique app/, scripts/, models/best.pt, README.md, requirements.txt e o PDF em reports/.
-- Verifique os créditos da base e as condições das dependências.
-- Adicione os links reais do repositório e do vídeo ao README e ao portal da faculdade.
-- A publicação do código não coloca o site no ar. A URL pública do MVP será tratada em Secure.
+O histórico de commits documenta as alterações no código e nas evidências. Os arquivos JSON em `reports/` mantêm os resultados registrados da avaliação do modelo. A procedência das imagens utilizadas está indicada na documentação do dataset e em `examples/SOURCES.json`.

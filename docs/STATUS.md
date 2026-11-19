@@ -1,41 +1,55 @@
-# Situação da entrega - 10/11/2026
+# Estado técnico do AgroConecta ACV
 
-## Concluído e verificado
+Global Solution 2026.2 — FIAP  
+Revisão documental: 19/11/2026
 
-- Recorte PlantDoc real: 180 imagens de treino, 45 de validação, 27 de teste.
-- Seis duplicatas removidas; seis imagens com classes fora do escopo excluídas; uma imagem rejeitada por incompatibilidade de proporção com a anotação.
-- YOLOv8n ajustado por 30 épocas, imagens de 320 px, batch 8, CPU, semente 42. Peso `models/best.pt` incluído.
-- Avaliação independente no conjunto de teste: precisão 0,6022; recall 0,6628; mAP@50 0,6858; mAP@50:95 0,4367. Não são métricas de diagnóstico clínico nem acurácia.
-- API e interface executadas com o modelo real. Seis fotos testadas de ponta a ponta no navegador, incluindo erro e resultado inconclusivo.
-- Fluxo da câmera testado com dispositivo simulado pelo Chromium, incluindo início, análise e parada. Nessa verificação inicial não foi usada câmera física; posteriormente Bernardo confirmou o uso físico, conforme registro abaixo.
-- Layout inspecionado em 1365 px e 390 px, sem erro JavaScript e sem rolagem horizontal indevida no celular.
-- Sete testes automatizados passaram, incluindo integridade dos conjuntos, entrada inválida, limite de tamanho, orientação EXIF e ausência de modelo.
-- PDF técnico, análise de erros, notebook Colab, contrato da API e roteiro de vídeo incluídos.
+## Implementação
 
-## Limitações reais
+- Detector YOLOv8n com classes `tomate_saudavel`, `pinta_preta` e `requeima`.
+- Modelo treinado incluído em `models/best.pt` e identificado por SHA-256 em `models/metadata.json`.
+- Aplicação web FastAPI com upload de fotos, câmera e apresentação de detecções em caixas.
+- API `POST /api/predict`, além das rotas `/health`, `/ready` e `/docs`.
+- Repositório público: https://github.com/BernardoPRocha/agroconecta-acv.
+- Vídeo final de demonstração: https://www.youtube.com/watch?v=KIRmYhAmrdI.
+- Relatório acadêmico em `reports/Relatorio_Tecnico_ACV_AgroConecta.pdf`.
 
-O modelo ainda confunde doenças e perde folhas. Com confiança fixa 0,4 e IoU 0,5, a auditoria do teste encontrou 35 verdadeiros positivos, 29 falsos positivos e 25 falsos negativos, relativamente às anotações. As métricas agregadas de precisão/recall do Ultralytics usam seu próprio limiar escolhido na curva e não devem ser confundidas com esse ponto operacional fixo.
+## Dados e avaliação registrados
 
-A base de teste tem somente 27 imagens e não representa todos os ambientes rurais. A anotação de folhas do PlantDoc pode ser incompleta. Não houve calibração da confiança, teste com outras culturas, validação agronômica nem estudo de impacto em produtores. O desempenho medido nesta máquina não garante o mesmo FPS em outro equipamento ou na nuvem.
+| Indicador | Resultado |
+|---|---:|
+| Treino | 180 imagens |
+| Validação | 45 imagens |
+| Teste | 27 imagens |
+| Épocas de treinamento | 30 |
+| Resolução | 320 px |
+| Batch | 8 |
+| Precisão (teste) | 0,6022 |
+| Recall (teste) | 0,6628 |
+| mAP@50 (teste) | 0,6858 |
+| mAP@50:95 (teste) | 0,4367 |
 
-## Pendente para finalizar a entrega acadêmica
+Treinamento registrado em CPU, semente 42. A auditoria do conjunto de dados documentou seis duplicatas removidas, seis imagens fora do escopo excluídas e uma rejeição por incompatibilidade de anotação. Detalhes em `reports/dataset_audit.json`.
 
-1. Repetir rapidamente o teste com a interface atualizada antes de gravar; a câmera física já foi confirmada por Bernardo, apontada para uma imagem em outra tela.
-2. Gravar a apresentação narrada com câmera e inserir o link. A demonstração automática de fotos, sem áudio, já está em `docs/videos/Demonstracao_ACV_Fotos.mp4`.
-3. Publicar o repositório no GitHub e inserir o link da entrega.
-4. Integrar o módulo ao MVP central e publicar a URL na etapa de Secure.
-5. Conferir o enunciado original completo de ACV, além do resumo fornecido, antes de enviar à faculdade.
+A auditoria operacional de detecções, com confiança 0,4 e IoU 0,5, registrou 35 TP, 29 FP e 25 FN relativos às anotações. Esses valores não representam uma taxa de diagnóstico agronômico correto nem substituem o cálculo de mAP.
 
-Dockerfile e Compose foram preparados, mas não executados: Docker não estava instalado neste ambiente. Não há deploy público realizado nem repositório remoto criado. Esses itens não devem ser apresentados como concluídos.
+## Verificações da interface e da API
 
-## Conteúdo do ZIP
+- Sete testes automatizados registrados como aprovados.
+- Seis fotografias analisadas com o modelo real pela interface.
+- Verificações de layout em telas de tamanhos diferentes, sem erro JavaScript registrado.
+- Fluxo da câmera exercitado com dispositivo virtual durante os testes de navegador.
+- Demonstração adicional da câmera física, apontada para uma fotografia exibida em outra tela; não houve validação em campo.
 
-Inclui dados preparados, rótulos, manifesto, scripts, modelo, resultados, documentação e exemplos. O cache bruto duplicado e ambientes virtuais foram excluídos. O dataset pode ser regenerado a partir do commit fixado. Leia README.md para instalar e abrir a aplicação; não é necessário treinar novamente para usar o modelo incluído.
+Os resultados encontram-se em `reports/tests.txt`, `reports/browser_checks.json` e `reports/ui_update_checks.json`.
 
-## Atualização 1.1 - evidência fornecida pelo usuário
+## Limitações
 
-Bernardo informou que a câmera está funcionando e forneceu uma captura da câmera apontada para uma fotografia de folhas em uma tela. A captura mostra caixas e pontuações do detector. Isso registra uma demonstração de captura e inferência por câmera física; não é validação com folhas reais nem estudo em campo. Não há medição de FPS extraída dessa captura.
+O modelo pode confundir classes, omitir folhas e apresentar previsões que não coincidem com as anotações. A base de teste contém apenas 27 imagens e não representa toda a variabilidade de ambientes agrícolas.
 
-As etiquetas foram reduzidas para identificador e confiança, com correspondência numérica na lista completa. O modelo não foi retreinado e as métricas anteriores não foram alteradas.
+Não houve calibração probabilística da confiança, validação agronômica ou estudo de impacto sobre a produção agrícola. Uma imagem sem detecção é **inconclusiva**, não necessariamente saudável.
 
-Verificação da versão 1.1: seis fotos com inferência real, telas de 1280 px e 390 px, cenário sintético de 30 caixas apenas para testar o layout, sem sobreposição de etiquetas, cortes ou erros JavaScript. Resultado em `reports/ui_update_checks.json`. Os sete testes automatizados passaram novamente. Demonstração automática com fotos reais executada e gravada, sem áudio e sem câmera.
+O Dockerfile e o Compose fazem parte do pacote, mas esta documentação não inclui evidência de sua execução independente. A infraestrutura e as verificações de segurança do MVP são tratadas separadamente em [agroconecta-secure](https://github.com/BernardoPRocha/agroconecta-secure).
+
+## Integração com o AgroConecta
+
+O módulo ACV expõe uma API que pode ser consumida pelos outros componentes da plataforma. O código do MVP em Secure possui uma aplicação com visão computacional; isso é distinto do HTML estático de apresentação do grupo, que pode exibir uma demonstração sem executar inferência diretamente.

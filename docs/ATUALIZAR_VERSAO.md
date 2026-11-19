@@ -1,27 +1,19 @@
-# Atualizar para a versão 1.1
+# Histórico de versões — AgroConecta ACV
 
-Esta atualização muda a apresentação das detecções e a documentação. O modelo, as classes, as métricas e as dependências permanecem os mesmos.
+## Versão 1.1 — interface de detecção
 
-## Se você já instalou a versão anterior
+A versão 1.1 aprimorou a apresentação das detecções sem modificar os pesos treinados, o número de classes ou as métricas de avaliação.
 
-1. Pare a aplicação com Ctrl+C no terminal.
-2. Extraia o pacote `AgroConecta_ACV_Atualizacao_1_1.zip` em uma pasta temporária.
-3. Abra a pasta `agroconecta-acv` que veio na atualização.
-4. Copie o conteúdo dela para dentro da sua pasta `agroconecta-acv` existente. Aceite substituir os arquivos de mesmo nome. Evite criar uma pasta agroconecta-acv dentro de outra.
-5. Execute `INICIAR_WINDOWS.bat`.
-6. Abra http://localhost:8000 e pressione Ctrl+F5 para atualizar os arquivos do navegador.
-7. Teste uma foto pequena (pinta-preta 1) e uma foto com várias folhas (saudável 1). Cada caixa deve ter uma etiqueta curta, como #1 · 71%, com o mesmo número na lista de resultados.
+Principais alterações:
 
-Não apague a pasta .venv, não reinstale dependências e não treine o modelo novamente para esta atualização.
+- Etiquetas numeradas, com identificação e confiança, associadas à lista de resultados.
+- Posicionamento das etiquetas para reduzir sobreposição e corte, inclusive em imagens pequenas.
+- Área adicional para etiquetas em cenas muito densas, com linhas de ligação às caixas.
+- Redesenho automático das detecções quando a área de visualização muda de tamanho.
+- Registro complementar do funcionamento da câmera física com fotografia exibida em outra tela.
 
-## Se baixar o projeto completo atualizado
+Os testes de apresentação da versão 1.1 estão em `reports/ui_update_checks.json`. O treinamento e os resultados quantitativos permanecem registrados em `models/metadata.json` e `reports/test_metrics.json`.
 
-Ele já contém as alterações. Para preservar sua instalação, copie apenas os arquivos da atualização ou siga o README em uma pasta nova.
+## Execução
 
-## Mudanças
-
-- Texto calculado pelo tamanho de exibição, sem amplificação em fotos pequenas.
-- Etiquetas curtas, numeradas e separadas; a descrição completa aparece na lista.
-- Reposicionamento das etiquetas para evitar sobreposição e corte. Em cenas muito cheias, etiquetas excedentes vão para uma faixa abaixo da foto, com linhas de ligação.
-- Redesenho ao redimensionar a janela.
-- Relatório e situação da entrega atualizados com o teste de câmera informado por Bernardo.
+Os procedimentos de instalação e inicialização estão consolidados no [README principal](../README.md). Não há necessidade de aplicar manualmente um pacote incremental para obter a versão mantida no repositório.

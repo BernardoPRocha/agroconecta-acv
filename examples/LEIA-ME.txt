@@ -1,1 +1,7 @@
-Imagens reais do conjunto de TESTE PlantDoc, CC BY 4.0 conforme a base. Os nomes descrevem o rotulo da base, nao garantem que o modelo acertara. Os arquivos nao participaram do treinamento. Fontes em SOURCES.json; autoria e licenca em docs/PLANTDOC_LICENSE.txt. Nao confundir estas fotos com coleta propria em campo.
+Exemplos de imagens do conjunto de TESTE PlantDoc.
+
+As categorias indicadas nos nomes correspondem aos rótulos da base e não garantem que todas as previsões do modelo coincidam com essas classes.
+
+As imagens não foram utilizadas no treinamento do modelo documentado. Os identificadores e as fontes de cada arquivo estão em SOURCES.json. Atribuição da base: docs/PLANTDOC_LICENSE.txt.
+
+Essas fotografias provêm de um conjunto de dados público; não são registros de coleta própria em campo.

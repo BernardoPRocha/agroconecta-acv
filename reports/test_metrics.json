@@ -34,6 +34,6 @@
     "loss": 0.00033048148237766226,
     "postprocess": 0.9817208518509485
   },
-  "output_directory": "/workspace/scratch/5c0b4f82e4eb/agroconecta-acv/runs/test",
+  "output_directory": "runs/test",
   "note": "Offline dataset evaluation; not proof of field reliability or browser FPS."
 }

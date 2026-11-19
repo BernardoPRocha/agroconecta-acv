@@ -1,27 +1,22 @@
-# Vídeo de ACV - roteiro pronto para Bernardo
+# Demonstração em vídeo — AgroConecta ACV
 
-Duração sugerida: 3 a 4 minutos. Gravação pendente. Este roteiro não é um vídeo gravado e não comprova coleta em campo.
+**Vídeo final:** https://www.youtube.com/watch?v=KIRmYhAmrdI
 
-## Antes de gravar
+## Conteúdo apresentado
 
-Abra o sistema com INICIAR_WINDOWS.bat, acesse localhost:8000, atualize com Ctrl+F5 e prepare as imagens da pasta examples. Abra o relatório na página das métricas. Prepare uma fotografia de folha de tomate em outro dispositivo para o teste da câmera. Grave tela e sua voz; evite mostrar senhas, tokens ou informações pessoais.
+A demonstração audiovisual do módulo de visão computacional cobre:
 
-| Tempo aproximado | O que mostrar | O que falar |
-|---|---|---|
-| 0:00-0:25 | Página inicial | “Eu sou Bernardo Rocha, RM99209. Nosso grupo também tem Eric Rodrigues, RM550249, e Renato Izumi, RM99242. Este é o módulo de visão computacional do AgroConecta, voltado ao apoio de pequenos produtores.” |
-| 0:25-0:50 | Área de análise e categorias | “O protótipo analisa folhas de tomate e reconhece três categorias: aparência saudável, possível pinta-preta e possível requeima. Ele não reconhece todas as doenças nem foi treinado para outras culturas.” |
-| 0:50-1:20 | Enviar 1_pinta_preta_1.jpg e analisar | “Ao enviar a foto, a aplicação chama nossa API e o detector retorna caixas, categorias e confiança. Os números das etiquetas correspondem à lista ao lado. Confiança é a pontuação do modelo, não certeza de diagnóstico.” |
-| 1:20-1:55 | Usar câmera e mover a imagem no enquadramento | “Agora a análise usa a câmera física do computador. Estou apontando para uma fotografia exibida em outra tela. Isso demonstra captura e inferência contínua; não é um teste com uma planta real no campo.” |
-| 1:55-2:20 | Parar câmera e analisar 2_requeima_1.jpg | “O sistema também pode falhar. Neste exemplo, com o limite inicial de 40%, o resultado é inconclusivo. Ausência de detecção não significa que a planta esteja saudável.” |
-| 2:20-2:55 | Relatório: dados e métricas | “Usamos um recorte real do PlantDoc, com 180 imagens de treino, 45 de validação e 27 de teste. Ajustamos um YOLOv8n durante 30 épocas. O mAP a IoU 0,5 foi de 68,6%. Essa métrica avalia detecção e não equivale a 68,6% de diagnósticos corretos.” |
-| 2:55-3:25 | Relatório: erros e API | “Ainda existem confusões entre doenças e folhas não detectadas. Os erros estão documentados. A API permite conectar o módulo aos demais componentes do AgroConecta. A próxima validação será com mais imagens externas e folhas reais.” |
+1. Objetivo do AgroConecta e o uso da visão computacional na triagem de folhas de tomate.
+2. Arquitetura do detector YOLOv8n, treinamento e integração com Python/FastAPI.
+3. Metadados do modelo treinado e métricas da avaliação no conjunto de teste.
+4. Execução do aplicativo com fotografias de folhas e visualização das caixas, categorias e confiança.
+5. Captura pela câmera do dispositivo e análise de quadros sucessivos.
+6. Limitações do protótipo e caráter experimental das classificações.
 
-O tempo é uma referência. Descreva o resultado que realmente aparecer na sua gravação; não repita valores diferentes dos que estiverem na tela.
+## Escopo da evidência
 
-## Finalizar
+O aplicativo identifica aparência saudável, possíveis sinais de pinta-preta e possíveis sinais de requeima no recorte de folhas de tomate. As caixas correspondem a **folhas**, não a lesões individuais. A câmera foi demonstrada apontando para imagens em uma tela, sem teste de campo com plantas reais.
 
-Revise se textos e áudio estão legíveis, publique o vídeo na modalidade solicitada pelo professor e copie o link real. Não foi informado limite específico de duração de ACV no resumo recebido; confira o enunciado original antes da gravação definitiva.
+A avaliação do detector está em `reports/test_metrics.json` e o relatório acadêmico em `reports/Relatorio_Tecnico_ACV_AgroConecta.pdf`.
 
-## Demonstração já incluída
-
-`docs/videos/Demonstracao_ACV_Fotos.mp4` registra a interface executando três fotos com o modelo real (aparência saudável, possível pinta-preta e resultado inconclusivo). É uma demonstração automática sem áudio; não contém a câmera física nem substitui a apresentação narrada deste roteiro.
+O arquivo `docs/videos/Demonstracao_ACV_Fotos.mp4` permanece como registro complementar de uma execução automática com fotografias, sem narração. O vídeo final narrado é o publicado no YouTube.
